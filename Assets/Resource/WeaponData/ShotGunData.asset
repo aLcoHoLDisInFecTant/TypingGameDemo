@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bb1537f0b3ac1d48b79986df93ff627, type: 3}
   m_Name: ShotGunData
   m_EditorClassIdentifier: 
-  WeaponName: Weapon
+  WeaponName: shotgun
   Icon: {fileID: 0}
-  FireInterval: 0.5
-  ProjectilesPerShot: 1
-  SpreadAngle: 0
+  FireInterval: 0.6
+  ProjectilesPerShot: 5
+  SpreadAngle: 40
   IsSequential: 0
   SequentialInterval: 0.1
-  ProjectilePrefab: {fileID: 0}
+  ProjectilePrefab: {fileID: 5118744578210951224, guid: 7b1998fdb6f17a54aab31e326e6cdfc2, type: 3}
+  BaseDamage: 30
+  PiercingCount: 0

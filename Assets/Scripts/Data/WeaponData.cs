@@ -36,5 +36,11 @@ namespace TypeRogue.Data
 
         [Tooltip("子弹预制体")]
         public Projectile ProjectilePrefab;
+
+        [Tooltip("基础伤害")]
+        public int BaseDamage = 1;
+
+        [Tooltip("穿透次数 (0表示击中即销毁，1表示可穿透1个敌人击中第2个)")]
+        public int PiercingCount = 0;
     }
 }

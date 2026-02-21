@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 645dc7469de277446b6822464dbfded1, type: 3}
-  m_Name: Precise
+  m_Name: Rage
   m_EditorClassIdentifier: 
-  BuffName: Precise
-  TriggerWord: precise
+  BuffName: Rage
+  TriggerWord: rage
   Icon: {fileID: 0}
   Description: 
-  Cooldown: 1
+  Cooldown: 2
   Effects:
-  - {fileID: 11400000, guid: 1b72698b7cd0c5249989e69a520e57c4, type: 2}
+  - {fileID: 11400000, guid: bceaf69f9436fcc40b6a70a46e589632, type: 2}

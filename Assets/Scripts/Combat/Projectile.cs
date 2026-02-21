@@ -12,16 +12,21 @@ namespace TypeRogue
     public class Projectile : MonoBehaviour
     {
         [SerializeField] private float speed = 10f;
-        [SerializeField] private int damage = 1;
+        // [SerializeField] private int damage = 1; // Removed to avoid confusion with WeaponData.BaseDamage
         [SerializeField] private float maxLifetime = 5f;
+        [SerializeField] private int piercingCount = 0;
 
         private Vector2 direction;
+        private int damage = 1; // Internal state
         private float lifetime;
 
-        public void Initialize(Vector2 direction)
+        public void Initialize(Vector2 direction, int damage, float speedMultiplier = 1f, int piercingCount = 0)
         {
             this.direction = direction;
-            
+            this.damage = damage;
+            this.speed *= speedMultiplier;
+            this.piercingCount = piercingCount;
+
             // 根据飞行方向调整子弹朝向 (视觉效果)
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
             transform.rotation = Quaternion.Euler(0, 0, angle);
@@ -44,7 +49,15 @@ namespace TypeRogue
             if (other.TryGetComponent<Enemy>(out var enemy))
             {
                 enemy.TakeDamage(damage);
-                Destroy(gameObject);
+                
+                if (piercingCount > 0)
+                {
+                    piercingCount--;
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
             }
         }
     }

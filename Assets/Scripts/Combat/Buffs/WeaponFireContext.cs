@@ -13,6 +13,8 @@ namespace TypeRogue.Combat.Buffs
         public bool IsSequential;
         public float DamageMultiplier = 1f;
         public float SpeedMultiplier = 1f;
+        public int BaseDamage = 1;
+        public int PiercingCount = 0;
 
         public WeaponFireContext(WeaponData data)
         {
@@ -22,6 +24,8 @@ namespace TypeRogue.Combat.Buffs
                 ProjectileCount = data.ProjectilesPerShot;
                 SequentialInterval = data.SequentialInterval;
                 IsSequential = data.IsSequential;
+                BaseDamage = data.BaseDamage;
+                PiercingCount = data.PiercingCount;
             }
         }
     }

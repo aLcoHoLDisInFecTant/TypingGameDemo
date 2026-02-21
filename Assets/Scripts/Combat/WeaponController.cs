@@ -103,6 +103,7 @@ namespace TypeRogue
         {
             int projectileCount = Mathf.Max(1, context.ProjectileCount);
             float totalSpread = context.SpreadAngle;
+            int damage = Mathf.CeilToInt(context.BaseDamage * context.DamageMultiplier);
 
             // 1. 计算基础目标方向（预判后）
             // 注意：齐射时，所有子弹基于同一个时刻的预判
@@ -110,7 +111,7 @@ namespace TypeRogue
 
             for (int i = 0; i < projectileCount; i++)
             {
-                SpawnProjectile(baseDirection, totalSpread);
+                SpawnProjectile(baseDirection, totalSpread, damage, context.SpeedMultiplier, context.PiercingCount);
             }
         }
 
@@ -120,6 +121,7 @@ namespace TypeRogue
             int projectileCount = Mathf.Max(1, context.ProjectileCount);
             float totalSpread = context.SpreadAngle;
             float interval = Mathf.Max(0.01f, context.SequentialInterval);
+            int damage = Mathf.CeilToInt(context.BaseDamage * context.DamageMultiplier);
 
             // 1. 锁定当前最近的敌人
             Enemy lockedTarget = GetNearestEnemy();
@@ -136,22 +138,9 @@ namespace TypeRogue
 
                 if (hasLockedTarget)
                 {
-                    // 如果锁定的目标还活着，更新其位置并进行预判
                     if (lockedTarget != null)
                     {
                         lastKnownTargetPos = lockedTarget.transform.position;
-                        // 预判射击逻辑
-                        float distance = Vector3.Distance(muzzleTransform.position, lastKnownTargetPos);
-                        float timeToHit = distance / projectileSpeed; // 假设子弹速度恒定
-                        // 简单的线性预测：位置 + 速度 * 时间
-                        // 注意：Enemy 类需要公开 Velocity 属性，如果没有则只能用当前位置
-                        // 这里假设 Enemy 有 Velocity 属性，如果没有请自行添加或移除预判
-                         Vector3 predictedPos = lastKnownTargetPos;
-                        // 尝试获取 Velocity (反射或假设存在)
-                        // 实际上 GetNearestEnemyDirection 里已经有预判逻辑了，我们可以提取出来
-                        // 为了简化，我们直接计算方向指向当前位置（或稍微预判）
-                        
-                        // 使用提取的预判逻辑
                         fireDirection = CalculatePredictiveAim(lockedTarget.transform.position, Vector3.zero, muzzleTransform.position, projectileSpeed);
                     }
                     else
@@ -162,11 +151,10 @@ namespace TypeRogue
                 }
                 else
                 {
-                    // 初始就没有目标，默认向上
                     fireDirection = Vector2.up;
                 }
-                
-                SpawnProjectile(fireDirection, totalSpread);
+
+                SpawnProjectile(fireDirection, totalSpread, damage, context.SpeedMultiplier, context.PiercingCount);
 
                 if (i < projectileCount - 1)
                 {
@@ -176,7 +164,7 @@ namespace TypeRogue
             isFiringSequential = false;
         }
 
-        private void SpawnProjectile(Vector2 baseDirection, float totalSpread)
+        private void SpawnProjectile(Vector2 baseDirection, float totalSpread, int damage, float speedMultiplier, int piercingCount)
         {
             // 计算随机角度偏移 (-Spread/2 到 +Spread/2)
             float randomAngle = UnityEngine.Random.Range(-totalSpread / 2f, totalSpread / 2f);
@@ -191,7 +179,7 @@ namespace TypeRogue
             if (weaponData.ProjectilePrefab != null)
             {
                 var projectile = Instantiate(weaponData.ProjectilePrefab, muzzleTransform.position, rotation);
-                projectile.Initialize(finalDirection);
+                projectile.Initialize(finalDirection, damage, speedMultiplier, piercingCount);
             }
         }
 
