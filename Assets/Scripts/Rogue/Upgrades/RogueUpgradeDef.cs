@@ -9,7 +9,7 @@ namespace TypeRogue.Rogue
         [TextArea] public string Description;
         public Sprite Icon;
         
-        public enum RarityType { Common, Rare, Legendary }
+        public enum RarityType { Common, Rare, Epic, Legendary }
         public RarityType Rarity = RarityType.Common;
 
         /// <summary>

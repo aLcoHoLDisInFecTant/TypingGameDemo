@@ -17,7 +17,7 @@ namespace TypeRogue
 
         [Header("Wave Configuration")]
         [SerializeField] private List<WaveData> waves;
-        [SerializeField] private bool autoStart = false; // 由 Bootstrap 控制启动
+        // [SerializeField] private bool autoStart = false; // 由 Bootstrap 控制启动
 
         [Header("Spawn Area")]
         [SerializeField] private SpriteRenderer spawnArea; // 引用场景中的方形 Sprite

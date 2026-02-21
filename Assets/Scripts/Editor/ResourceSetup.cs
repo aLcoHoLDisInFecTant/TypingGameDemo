@@ -54,33 +54,86 @@ public class ResourceSetup
         EditorUtility.SetDirty(enemyTank);
 
         // 4. Create WaveData (Level 1)
-        var waveData = CreateAsset<WaveData>("Assets/Data/Waves/Wave_Level1.asset");
-        waveData.Groups = new List<WaveGroup>();
+        var wave1 = CreateAsset<WaveData>("Assets/Data/Waves/Wave_Level1.asset");
+        wave1.Groups = new List<WaveGroup>();
         
-        // Group 1: 3 Basic enemies
-        var group1 = new WaveGroup();
-        group1.EnemyType = enemyBasic;
-        group1.Count = 3;
-        group1.SpawnInterval = 1.5f;
-        group1.PreDelay = 2f;
-        waveData.Groups.Add(group1);
+        // Wave 1 - Group 1: 3 Basic enemies
+        var w1g1 = new WaveGroup();
+        w1g1.EnemyType = enemyBasic;
+        w1g1.Count = 3;
+        w1g1.SpawnInterval = 1.5f;
+        w1g1.PreDelay = 2f;
+        wave1.Groups.Add(w1g1);
 
-        // Group 2: 2 Fast enemies
-        var group2 = new WaveGroup();
-        group2.EnemyType = enemyFast;
-        group2.Count = 2;
-        group2.SpawnInterval = 1.0f;
-        group2.PreDelay = 3f;
-        waveData.Groups.Add(group2);
+        // Wave 1 - Group 2: 2 Fast enemies
+        var w1g2 = new WaveGroup();
+        w1g2.EnemyType = enemyFast;
+        w1g2.Count = 2;
+        w1g2.SpawnInterval = 1.0f;
+        w1g2.PreDelay = 3f;
+        wave1.Groups.Add(w1g2);
 
-        // Group 3: 1 Tank
-        var group3 = new WaveGroup();
-        group3.EnemyType = enemyTank;
-        group3.Count = 1;
-        group3.PreDelay = 5f;
-        waveData.Groups.Add(group3);
+        EditorUtility.SetDirty(wave1);
 
-        EditorUtility.SetDirty(waveData);
+        // Wave 2 (Medium)
+        var wave2 = CreateAsset<WaveData>("Assets/Data/Waves/Wave_Level2.asset");
+        wave2.Groups = new List<WaveGroup>();
+
+        // Wave 2 - Group 1: 5 Basic enemies
+        var w2g1 = new WaveGroup();
+        w2g1.EnemyType = enemyBasic;
+        w2g1.Count = 5;
+        w2g1.SpawnInterval = 1.2f;
+        w2g1.PreDelay = 1f;
+        wave2.Groups.Add(w2g1);
+
+        // Wave 2 - Group 2: 3 Fast enemies
+        var w2g2 = new WaveGroup();
+        w2g2.EnemyType = enemyFast;
+        w2g2.Count = 3;
+        w2g2.SpawnInterval = 0.8f;
+        w2g2.PreDelay = 2f;
+        wave2.Groups.Add(w2g2);
+
+        // Wave 2 - Group 3: 1 Tank
+        var w2g3 = new WaveGroup();
+        w2g3.EnemyType = enemyTank;
+        w2g3.Count = 1;
+        w2g3.PreDelay = 3f;
+        wave2.Groups.Add(w2g3);
+
+        EditorUtility.SetDirty(wave2);
+
+        // Wave 3 (Hard)
+        var wave3 = CreateAsset<WaveData>("Assets/Data/Waves/Wave_Level3.asset");
+        wave3.Groups = new List<WaveGroup>();
+
+        // Wave 3 - Group 1: Swarm of Fast enemies
+        var w3g1 = new WaveGroup();
+        w3g1.EnemyType = enemyFast;
+        w3g1.Count = 8;
+        w3g1.SpawnInterval = 0.5f;
+        w3g1.PreDelay = 1f;
+        wave3.Groups.Add(w3g1);
+
+        // Wave 3 - Group 2: Tank duo
+        var w3g2 = new WaveGroup();
+        w3g2.EnemyType = enemyTank;
+        w3g2.Count = 2;
+        w3g2.SpawnInterval = 5f;
+        w3g2.PreDelay = 2f;
+        wave3.Groups.Add(w3g2);
+
+        // Wave 3 - Group 3: Mixed Basic and Fast
+        var w3g3 = new WaveGroup();
+        w3g3.EnemyType = enemyBasic;
+        w3g3.Count = 5;
+        w3g3.SpawnInterval = 1f;
+        w3g3.PreDelay = 1f;
+        wave3.Groups.Add(w3g3);
+
+        EditorUtility.SetDirty(wave3);
+
 
         // 5. Create BuffData (Rage)
         var rageEffect = CreateAsset<RageBuffEffect>("Assets/Data/Buffs/Effect_Rage.asset");
@@ -165,7 +218,56 @@ public class ResourceSetup
         aliasUpgrade.Rarity = TypeRogue.Rogue.RogueUpgradeDef.RarityType.Common;
         EditorUtility.SetDirty(aliasUpgrade);
 
-        // 8. Assign to RogueManager in Scene
+        // 8. Create More Upgrades
+        // Upgrade 5: Health Recovery
+        var healthRecovery = CreateAsset<HealthUpgrade>("Assets/Data/Upgrades/Upgrade_HealthRecovery.asset");
+        healthRecovery.Title = "Health Potion";
+        healthRecovery.Description = "Recover 50 HP.";
+        healthRecovery.HealAmount = 50;
+        healthRecovery.Rarity = TypeRogue.Rogue.RogueUpgradeDef.RarityType.Common;
+        EditorUtility.SetDirty(healthRecovery);
+
+        // Upgrade 6: Shotgun Spread Reduction (Tighter spread)
+        var shotgunTight = CreateAsset<StatBoostUpgrade>("Assets/Data/Upgrades/Upgrade_ShotgunTight.asset");
+        shotgunTight.Title = "Choke Mod";
+        shotgunTight.Description = "Reduce Shotgun spread by 20% for more focused damage.";
+        shotgunTight.TargetWeaponName = "Shotgun";
+        shotgunTight.Stat = StatBoostUpgrade.StatType.SpreadReduction;
+        shotgunTight.Value = 0.2f;
+        shotgunTight.Rarity = TypeRogue.Rogue.RogueUpgradeDef.RarityType.Rare;
+        EditorUtility.SetDirty(shotgunTight);
+
+        // Upgrade 7: Rifle Piercing
+        var riflePierce = CreateAsset<StatBoostUpgrade>("Assets/Data/Upgrades/Upgrade_RiflePierce.asset");
+        riflePierce.Title = "AP Rounds";
+        riflePierce.Description = "Rifle bullets pierce 1 additional enemy.";
+        riflePierce.TargetWeaponName = "Rifle";
+        riflePierce.Stat = StatBoostUpgrade.StatType.Piercing;
+        riflePierce.Value = 1f;
+        riflePierce.Rarity = TypeRogue.Rogue.RogueUpgradeDef.RarityType.Epic;
+        EditorUtility.SetDirty(riflePierce);
+
+        // Upgrade 8: Global Fire Rate
+        var globalFireRate = CreateAsset<StatBoostUpgrade>("Assets/Data/Upgrades/Upgrade_GlobalHaste.asset");
+        globalFireRate.Title = "Adrenaline";
+        globalFireRate.Description = "Increase fire rate of ALL weapons by 15%.";
+        globalFireRate.TargetWeaponName = "All";
+        globalFireRate.Stat = StatBoostUpgrade.StatType.FireRate;
+        globalFireRate.Value = 0.15f;
+        globalFireRate.Rarity = TypeRogue.Rogue.RogueUpgradeDef.RarityType.Rare;
+        EditorUtility.SetDirty(globalFireRate);
+
+        // Upgrade 9: Shotgun Damage
+        var shotgunDamage = CreateAsset<StatBoostUpgrade>("Assets/Data/Upgrades/Upgrade_ShotgunDamage.asset");
+        shotgunDamage.Title = "Heavy Shells";
+        shotgunDamage.Description = "Increase Shotgun damage by 50%.";
+        shotgunDamage.TargetWeaponName = "Shotgun";
+        shotgunDamage.Stat = StatBoostUpgrade.StatType.DamageMultiplier;
+        shotgunDamage.Value = 0.5f;
+        shotgunDamage.Rarity = TypeRogue.Rogue.RogueUpgradeDef.RarityType.Epic;
+        EditorUtility.SetDirty(shotgunDamage);
+
+        // 9. Assign to RogueManager in Scene
         var rogueManager = Object.FindFirstObjectByType<TypeRogue.Rogue.RogueManager>();
         if (rogueManager != null)
         {
@@ -176,7 +278,10 @@ public class ResourceSetup
             if (upgradePoolProp != null)
             {
                 upgradePoolProp.ClearArray();
-                var upgrades = new List<TypeRogue.Rogue.RogueUpgradeDef> { unlockShotgun, unlockRifle, damageBoost, fireRateBoost, aliasUpgrade };
+                var upgrades = new List<TypeRogue.Rogue.RogueUpgradeDef> { 
+                    unlockShotgun, unlockRifle, damageBoost, fireRateBoost, aliasUpgrade,
+                    healthRecovery, shotgunTight, riflePierce, globalFireRate, shotgunDamage
+                };
                 
                 for (int i = 0; i < upgrades.Count; i++)
                 {
@@ -192,11 +297,11 @@ public class ResourceSetup
         AssetDatabase.Refresh();
         Debug.Log("Resources Created Successfully!");
 
-        // 7. Scene Configuration
-        SetupScene(waveData, rageBuff, shotgun, rifle);
+        // 196
+        SetupScene(wave1, wave2, wave3, rageBuff, shotgun, rifle);
     }
 
-    private static void SetupScene(WaveData waveData, BuffData rageBuff, WeaponData shotgunData, WeaponData rifleData)
+    private static void SetupScene(WaveData wave1, WaveData wave2, WaveData wave3, BuffData rageBuff, WeaponData shotgunData, WeaponData rifleData)
     {
         // Find EnemySpawner
         var spawner = Object.FindAnyObjectByType<EnemySpawner>();
@@ -205,12 +310,13 @@ public class ResourceSetup
             var wavesField = typeof(EnemySpawner).GetField("waves", BindingFlags.NonPublic | BindingFlags.Instance);
             if (wavesField != null)
             {
-                var list = new List<WaveData> { waveData };
+                var list = new List<WaveData> { wave1, wave2, wave3 };
                 wavesField.SetValue(spawner, list);
                 EditorUtility.SetDirty(spawner);
-                Debug.Log("Assigned WaveData to EnemySpawner.");
+                Debug.Log("Assigned WaveData (1, 2, 3) to EnemySpawner.");
             }
         }
+
         else
         {
             Debug.LogWarning("EnemySpawner not found in scene.");

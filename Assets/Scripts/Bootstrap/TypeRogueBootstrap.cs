@@ -275,10 +275,14 @@ namespace TypeRogue
 
         private void GameOver()
         {
-            Debug.Log("[Bootstrap] GAME OVER!");
-            gameState = GameState.GameOver;
-            if (battleHudView != null) battleHudView.SetWaveText("GAME OVER! Type 'restart'");
-            if (enemySpawner != null) enemySpawner.StopSpawning();
+            Debug.Log("[Bootstrap] GAME OVER! Restarting scene immediately...");
+            // Directly reload scene
+            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            
+            // Old logic:
+            // gameState = GameState.GameOver;
+            // if (battleHudView != null) battleHudView.SetWaveText("GAME OVER! Type 'restart'");
+            // if (enemySpawner != null) enemySpawner.StopSpawning();
         }
 
         public void UnlockWeapon(WeaponData weapon)
@@ -340,6 +344,14 @@ namespace TypeRogue
         public void RegisterAlias(TypingResolveResultType type, string alias)
         {
             typingCommandInterpreter.RegisterAlias(type, alias);
+        }
+
+        public void HealPlayer(int amount)
+        {
+            if (playerController != null)
+            {
+                playerController.Heal(amount);
+            }
         }
 
         public void ModifyWeaponStat(string targetWeaponName, StatBoostUpgrade.StatType stat, float value)

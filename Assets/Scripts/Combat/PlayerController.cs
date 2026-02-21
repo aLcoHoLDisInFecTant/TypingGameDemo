@@ -31,6 +31,13 @@ namespace TypeRogue
             }
         }
 
+        public void Heal(int amount)
+        {
+            currentHp = Mathf.Min(maxHp, currentHp + amount);
+            Debug.Log($"[Player] Healed {amount} HP. Current HP: {currentHp}");
+            HpChanged?.Invoke(currentHp);
+        }
+
         public void TakeDamage(int amount)
         {
             currentHp = Mathf.Max(0, currentHp - amount);

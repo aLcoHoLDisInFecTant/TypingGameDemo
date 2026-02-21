@@ -10,16 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f44609c7569247049a1a7cf53732d9ee, type: 3}
-  m_Name: Wave_Level1
+  m_Name: Wave_Level3
   m_EditorClassIdentifier: 
   Groups:
-  - EnemyType: {fileID: 11400000, guid: 9affb961952fafa47b58fb6c460d8eae, type: 2}
-    Count: 3
-    SpawnInterval: 1.5
+  - EnemyType: {fileID: 11400000, guid: b03a7bbf1ba64b94d913c09569cc0f1a, type: 2}
+    Count: 8
+    SpawnInterval: 0.5
+    PreDelay: 1
+    PostDelay: 0
+  - EnemyType: {fileID: 11400000, guid: dd50a13a65bd8c4469b53c03b51339d5, type: 2}
+    Count: 2
+    SpawnInterval: 5
     PreDelay: 2
     PostDelay: 0
-  - EnemyType: {fileID: 11400000, guid: b03a7bbf1ba64b94d913c09569cc0f1a, type: 2}
-    Count: 2
+  - EnemyType: {fileID: 11400000, guid: 9affb961952fafa47b58fb6c460d8eae, type: 2}
+    Count: 5
     SpawnInterval: 1
-    PreDelay: 3
+    PreDelay: 1
     PostDelay: 0
