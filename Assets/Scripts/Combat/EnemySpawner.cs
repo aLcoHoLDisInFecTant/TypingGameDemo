@@ -1,39 +1,106 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using TypeRogue.Data;
 
 namespace TypeRogue
 {
     /// <summary>
-    /// 敌人生成器：基于 SpawnArea Sprite 范围生成敌人
+    /// 敌人生成器：基于 WaveData 生成敌人
     /// 功能：
-    /// 1. 在指定的 SpawnArea 范围内随机生成敌人
-    /// 2. 控制生成间隔
+    /// 1. 按波次配置生成敌人
+    /// 2. 支持多种敌人类型、数量、间隔
     /// </summary>
     public class EnemySpawner : MonoBehaviour
     {
-        [Header("Settings")]
-        [SerializeField] private Enemy enemyPrefab;
-        [SerializeField] private float spawnInterval = 2f;
-        
+        [Header("Wave Configuration")]
+        [SerializeField] private List<WaveData> waves;
+        [SerializeField] private bool autoStart = false; // 由 Bootstrap 控制启动
+
         [Header("Spawn Area")]
         [SerializeField] private SpriteRenderer spawnArea; // 引用场景中的方形 Sprite
 
-        private float spawnTimer;
+        private Coroutine currentWaveCoroutine;
 
-        private void Update()
+        private void Start()
         {
-            if (spawnArea == null) return;
-
-            spawnTimer += Time.deltaTime;
-            if (spawnTimer >= spawnInterval)
+            if (autoStart && waves != null && waves.Count > 0)
             {
-                spawnTimer = 0f;
-                SpawnEnemy();
+                StartWave(0);
             }
         }
 
-        private void SpawnEnemy()
+        public void StartWave(int waveIndex)
         {
-            if (enemyPrefab == null || spawnArea == null) return;
+            if (waves == null || waveIndex < 0 || waveIndex >= waves.Count)
+            {
+                Debug.LogWarning($"[EnemySpawner] Invalid wave index: {waveIndex}");
+                return;
+            }
+
+            if (currentWaveCoroutine != null)
+            {
+                StopCoroutine(currentWaveCoroutine);
+            }
+            
+            Debug.Log($"[EnemySpawner] Starting Wave {waveIndex}");
+            currentWaveCoroutine = StartCoroutine(ProcessWaveRoutine(waves[waveIndex]));
+        }
+
+        public void StopSpawning()
+        {
+            if (currentWaveCoroutine != null)
+            {
+                StopCoroutine(currentWaveCoroutine);
+                currentWaveCoroutine = null;
+            }
+        }
+
+        private IEnumerator ProcessWaveRoutine(WaveData waveData)
+        {
+            if (waveData == null || waveData.Groups == null) yield break;
+
+            foreach (var group in waveData.Groups)
+            {
+                if (group == null) continue;
+
+                // 组前延迟
+                if (group.PreDelay > 0)
+                {
+                    yield return new WaitForSeconds(group.PreDelay);
+                }
+
+                // 生成该组敌人
+                for (int i = 0; i < group.Count; i++)
+                {
+                    SpawnEnemy(group.EnemyType);
+
+                    // 组内生成间隔（除了最后一个）
+                    if (group.SpawnInterval > 0 && i < group.Count - 1)
+                    {
+                        yield return new WaitForSeconds(group.SpawnInterval);
+                    }
+                }
+
+                // 组后延迟
+                if (group.PostDelay > 0)
+                {
+                    yield return new WaitForSeconds(group.PostDelay);
+                }
+            }
+            
+            Debug.Log("[EnemySpawner] Wave Completed");
+            currentWaveCoroutine = null;
+        }
+
+        private void SpawnEnemy(EnemyData enemyData)
+        {
+            if (spawnArea == null) return;
+            if (enemyData == null || enemyData.Prefab == null)
+            {
+                Debug.LogWarning("[EnemySpawner] Missing EnemyData or Prefab");
+                return;
+            }
 
             // 获取 Sprite 的世界坐标包围盒
             Bounds bounds = spawnArea.bounds;
@@ -45,7 +112,8 @@ namespace TypeRogue
             // Z轴通常为0，或者保持与SpawnArea一致
             Vector3 spawnPos = new Vector3(randomX, randomY, spawnArea.transform.position.z);
             
-            Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+            var enemy = Instantiate(enemyData.Prefab, spawnPos, Quaternion.identity);
+            enemy.Initialize(enemyData);
         }
     }
 }

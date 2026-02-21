@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using TypeRogue.Data;
 
 namespace TypeRogue
 {
@@ -21,10 +22,25 @@ namespace TypeRogue
         public Vector3 Velocity => Vector3.down * moveSpeed;
 
         private int currentHp;
+        private EnemyData data; // 缓存数据引用
 
         private void Awake()
         {
             currentHp = maxHp;
+        }
+
+        public void Initialize(EnemyData data)
+        {
+            if (data == null) return;
+            this.data = data;
+            
+            // 使用数据覆盖默认值
+            this.moveSpeed = data.MoveSpeed;
+            this.maxHp = data.MaxHp;
+            this.damageToPlayer = data.DamageToPlayer;
+            
+            // 重置状态
+            this.currentHp = this.maxHp;
         }
 
         private void Update()

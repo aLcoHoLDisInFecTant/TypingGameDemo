@@ -1,82 +1,10 @@
 # 🔴 Unity 实时报错日志 (供 Cursor 读取)
 
 **项目:** TypeRogue
-**最后更新:** 2026-02-22 00:24:07
+**最后更新:** 2026-02-22 00:49:37
 
 ---
 
-### ⏰ [23:32:18] 编译错误
-**报错信息:**
-```text
-Assets\Scripts\Combat\PistolWeaponController.cs(169,17): error CS0103: The name 'SpawnProjectile' does not exist in the current context
-```
----
-### ⏰ [23:32:18] 运行时错误
-**报错信息:**
-```text
-*** Tundra build failed (0.23 seconds), 2 items updated, 962 evaluated
-```
----
-### ⏰ [23:32:18] 编译错误
-**报错信息:**
-```text
-## Script Compilation Error for: Csc Library/Bee/artifacts/1900b0aEDbg.dag/Assembly-CSharp.dll (+2 others)
-```
----
-### ⏰ [23:32:18] 编译错误
-**报错信息:**
-```text
-Assets\Scripts\Combat\PistolWeaponController.cs(113,17): error CS0103: The name 'SpawnProjectile' does not exist in the current context
-```
----
-### ⏰ [23:32:18] 编译错误
-**报错信息:**
-```text
-Assets\Scripts\Combat\PistolWeaponController.cs(169,17): error CS0103: The name 'SpawnProjectile' does not exist in the current context
-```
----
-### ⏰ [23:32:18] 编译错误
-**报错信息:**
-```text
-Assets\Scripts\Combat\PistolWeaponController.cs(113,17): error CS0103: The name 'SpawnProjectile' does not exist in the current context
-```
----
-### ⏰ [23:32:18] 编译错误
-**报错信息:**
-```text
-Assets\Scripts\Combat\PistolWeaponController.cs(169,17): error CS0103: The name 'SpawnProjectile' does not exist in the current context
-```
----
-### ⏰ [23:33:32] 运行时错误
-**报错信息:**
-```text
-LogAssemblyErrors (0ms)
-```
----
-### ⏰ [23:33:38] 运行时错误
-**报错信息:**
-```text
-LogAssemblyErrors (0ms)
-```
----
-### ⏰ [23:37:52] 运行时错误
-**报错信息:**
-```text
-LogAssemblyErrors (0ms)
-```
----
-### ⏰ [23:43:22] 运行时错误
-**报错信息:**
-```text
-LogAssemblyErrors (0ms)
-```
----
-### ⏰ [23:50:22] 运行时错误
-**报错信息:**
-```text
-LogAssemblyErrors (0ms)
-```
----
 ### ⏰ [23:51:11] 运行时错误
 **报错信息:**
 ```text
@@ -180,6 +108,78 @@ LogAssemblyErrors (0ms)
 ```
 ---
 ### ⏰ [00:24:07] 运行时错误
+**报错信息:**
+```text
+LogAssemblyErrors (0ms)
+```
+---
+### ⏰ [00:36:32] 运行时错误
+**报错信息:**
+```text
+-define:ENABLE_CLOUD_SERVICES_CRASH_REPORTING
+```
+---
+### ⏰ [00:36:32] 运行时错误
+**报错信息:**
+```text
+-define:ENABLE_OUT_OF_PROCESS_CRASH_HANDLER
+```
+---
+### ⏰ [00:36:32] 运行时错误
+**报错信息:**
+```text
+-r:"D:/Unity/Editor/6000.1.17f1/Editor/Data/Managed/UnityEngine/UnityEngine.CrashReportingModule.dll"
+```
+---
+### ⏰ [00:36:32] 编译错误
+**报错信息:**
+```text
+Assets\Scripts\Bootstrap\TypeRogueBootstrap.cs(175,22): error CS0111: Type 'TypeRogueBootstrap' already defines a member called 'Start' with the same parameter types
+```
+---
+### ⏰ [00:36:32] 运行时错误
+**报错信息:**
+```text
+*** Tundra build failed (0.36 seconds), 3 items updated, 962 evaluated
+```
+---
+### ⏰ [00:36:32] 编译错误
+**报错信息:**
+```text
+## Script Compilation Error for: Csc Library/Bee/artifacts/1900b0aEDbg.dag/Assembly-CSharp.dll (+2 others)
+```
+---
+### ⏰ [00:36:32] 编译错误
+**报错信息:**
+```text
+Assets\Scripts\Bootstrap\TypeRogueBootstrap.cs(175,22): error CS0111: Type 'TypeRogueBootstrap' already defines a member called 'Start' with the same parameter types
+```
+---
+### ⏰ [00:36:32] 编译错误
+**报错信息:**
+```text
+Assets\Scripts\Bootstrap\TypeRogueBootstrap.cs(175,22): error CS0111: Type 'TypeRogueBootstrap' already defines a member called 'Start' with the same parameter types
+```
+---
+### ⏰ [00:39:39] 运行时错误
+**报错信息:**
+```text
+LogAssemblyErrors (0ms)
+```
+---
+### ⏰ [00:44:03] 运行时错误
+**报错信息:**
+```text
+LogAssemblyErrors (0ms)
+```
+---
+### ⏰ [00:44:52] 运行时错误
+**报错信息:**
+```text
+LogAssemblyErrors (0ms)
+```
+---
+### ⏰ [00:49:37] 运行时错误
 **报错信息:**
 ```text
 LogAssemblyErrors (0ms)

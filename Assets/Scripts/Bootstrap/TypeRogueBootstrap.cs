@@ -71,6 +71,25 @@ namespace TypeRogue
             TrySetup();
         }
 
+        private void Start()
+        {
+            if (TrySetup())
+            {
+                // 启动第一波敌人
+                // 假设 WaveIndex 从 1 开始，转换为 0 索引
+                int waveIndex = Mathf.Max(0, initialWaveIndex - 1);
+                enemySpawner.StartWave(waveIndex);
+                return;
+            }
+
+            if (typingInputRouter == null) throw new InvalidOperationException($"{nameof(typingInputRouter)} is not assigned.");
+            if (typingCommandInterpreter == null) throw new InvalidOperationException($"{nameof(typingCommandInterpreter)} is not assigned.");
+            if (pistolWeaponController == null) throw new InvalidOperationException($"{nameof(pistolWeaponController)} is not assigned.");
+            if (playerController == null) throw new InvalidOperationException($"{nameof(playerController)} is not assigned.");
+            if (battleHudView == null) throw new InvalidOperationException($"{nameof(battleHudView)} is not assigned.");
+            if (typingInputBarView == null) throw new InvalidOperationException($"{nameof(typingInputBarView)} is not assigned.");
+        }
+
         private void Awake()
         {
             // 尝试自动获取同GameObject上的组件
@@ -161,17 +180,7 @@ namespace TypeRogue
             return true;
         }
 
-        private void Start()
-        {
-            if (TrySetup()) return;
 
-            if (typingInputRouter == null) throw new InvalidOperationException($"{nameof(typingInputRouter)} is not assigned.");
-            if (typingCommandInterpreter == null) throw new InvalidOperationException($"{nameof(typingCommandInterpreter)} is not assigned.");
-            if (pistolWeaponController == null) throw new InvalidOperationException($"{nameof(pistolWeaponController)} is not assigned.");
-            if (playerController == null) throw new InvalidOperationException($"{nameof(playerController)} is not assigned.");
-            if (battleHudView == null) throw new InvalidOperationException($"{nameof(battleHudView)} is not assigned.");
-            if (typingInputBarView == null) throw new InvalidOperationException($"{nameof(typingInputBarView)} is not assigned.");
-        }
 
         private void OnDestroy()
         {
