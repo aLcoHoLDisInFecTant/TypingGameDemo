@@ -22,16 +22,19 @@ namespace TypeRogue
         [Header("Spawn Area")]
         [SerializeField] private SpriteRenderer spawnArea; // 引用场景中的方形 Sprite
 
+        public int WaveCount => waves != null ? waves.Count : 0;
+
         private Coroutine currentWaveCoroutine;
         private int activeEnemyCount = 0;
         private bool isWaveSpawning = false;
 
         private void Start()
         {
-            if (autoStart && waves != null && waves.Count > 0)
-            {
-                StartWave(0);
-            }
+            // autoStart logic removed to ensure Bootstrap control
+            // if (autoStart && waves != null && waves.Count > 0)
+            // {
+            //     StartWave(0);
+            // }
         }
 
         public void StartWave(int waveIndex)

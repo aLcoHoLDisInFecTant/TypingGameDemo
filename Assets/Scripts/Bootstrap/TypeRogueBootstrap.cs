@@ -210,6 +210,12 @@ namespace TypeRogue
             // 7. 初始化输入栏
             typingInputBarView.Initialize(null); // 同上
 
+            // Sync maxWaves with EnemySpawner configuration
+            if (enemySpawner != null)
+            {
+                maxWaves = enemySpawner.WaveCount;
+            }
+
             isSetup = true;
             Debug.Log("TypeRogue Bootstrap Setup Complete.");
             return true;
@@ -217,7 +223,16 @@ namespace TypeRogue
 
         private void OnWaveCleared()
         {
-            Debug.Log($"[Bootstrap] Wave {currentWaveIndex + 1} Cleared! Initiating Rogue Shop sequence...");
+            Debug.Log($"[Bootstrap] Wave {currentWaveIndex + 1} Cleared!");
+
+            // If this was the last wave, trigger Victory immediately
+            if (currentWaveIndex + 1 >= maxWaves)
+            {
+                Victory();
+                return;
+            }
+
+            Debug.Log($"[Bootstrap] Initiating Rogue Shop sequence...");
             // 暂停输入? 暂时不需要，因为RogueManager会接管
             if (rogueManager != null)
             {
