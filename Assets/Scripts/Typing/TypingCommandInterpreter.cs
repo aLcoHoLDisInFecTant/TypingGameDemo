@@ -47,6 +47,31 @@ namespace TypeRogue
             }
         }
 
+        public void RegisterAlias(TypingResolveResultType type, string alias)
+        {
+            if (string.IsNullOrWhiteSpace(alias)) return;
+            string normalized = Normalize(alias);
+
+            switch (type)
+            {
+                case TypingResolveResultType.WeaponPistol:
+                    pistolWords.Add(normalized);
+                    break;
+                case TypingResolveResultType.WeaponShotgun:
+                    shotgunWords.Add(normalized);
+                    break;
+                case TypingResolveResultType.WeaponRifle:
+                    rifleWords.Add(normalized);
+                    break;
+                case TypingResolveResultType.ModifierAccepted:
+                    buffWords.Add(normalized);
+                    break;
+                default:
+                    Debug.LogWarning($"[TypingCommandInterpreter] Cannot register alias '{alias}' for type {type}");
+                    break;
+            }
+        }
+
         public TypingResolveResult SubmitWord(string input)
         {
             string normalized = Normalize(input);

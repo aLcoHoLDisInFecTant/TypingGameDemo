@@ -45,9 +45,27 @@ namespace TypeRogue.UI
 
         public void UpdateBuffState(List<BuffInstance> buffInstances)
         {
-            // 假设 activeItems 和 buffInstances 顺序一致且数量一致
-            // 因为 Initialize 是根据 BuffData 列表创建的，而 BuffController 也是根据同样的列表初始化的
-            
+            // Sync UI items with data instances
+            // If we have more data than UI items, create new UI items
+            while (activeItems.Count < buffInstances.Count)
+            {
+                var newBuffIndex = activeItems.Count;
+                var newBuffData = buffInstances[newBuffIndex].Data;
+                
+                if (buffItemPrefab != null && buffContainer != null)
+                {
+                    var item = Instantiate(buffItemPrefab, buffContainer);
+                    item.Initialize(newBuffData.BuffName);
+                    item.transform.localScale = Vector3.one;
+                    activeItems.Add(item);
+                }
+                else
+                {
+                    break; // Should not happen if initialized correctly
+                }
+            }
+
+            // Update state for all items
             for (int i = 0; i < activeItems.Count; i++)
             {
                 if (i < buffInstances.Count)
@@ -57,6 +75,12 @@ namespace TypeRogue.UI
                     {
                         activeItems[i].SetState(instance.CurrentCooldown, instance.Data.Cooldown, instance.IsPrimed);
                     }
+                }
+                else
+                {
+                    // If we have more UI items than data (e.g. removed buff), disable or hide?
+                    // For now, TypeRogue doesn't seem to support removing buffs, so this is fine.
+                    // If needed: activeItems[i].gameObject.SetActive(false);
                 }
             }
         }

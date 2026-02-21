@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bb1537f0b3ac1d48b79986df93ff627, type: 3}
+  m_Name: Weapon_Rifle
+  m_EditorClassIdentifier: 
+  WeaponName: Rifle
+  Icon: {fileID: 0}
+  FireInterval: 0.1
+  ProjectilesPerShot: 1
+  SpreadAngle: 5
+  IsSequential: 1
+  SequentialInterval: 0.1
+  ProjectilePrefab: {fileID: 5118744578210951224, guid: 7b1998fdb6f17a54aab31e326e6cdfc2, type: 3}
+  BaseDamage: 1
+  PiercingCount: 1
+  DefaultAliases:
+  - rifle
+  - r
+  - "\u6B65\u67AA"

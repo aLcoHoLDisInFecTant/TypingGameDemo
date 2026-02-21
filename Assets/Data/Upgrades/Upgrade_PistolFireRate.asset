@@ -9,11 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7a57e5caded3944ca77916914ce063c, type: 3}
-  m_Name: lv1
+  m_Script: {fileID: 11500000, guid: 000365c19f288654ea71bb1ccc680669, type: 3}
+  m_Name: Upgrade_PistolFireRate
   m_EditorClassIdentifier: 
-  EnemyName: Enemy_lv1
-  Prefab: {fileID: 3348482379997688013, guid: 3fd3bd054bc8a814ab1debcbd43e8677, type: 3}
-  MaxHp: 10
-  MoveSpeed: 0.5
-  DamageToPlayer: 10
+  Title: Rapid Pistol
+  Description: Increase Pistol fire rate by 30%.
+  Icon: {fileID: 0}
+  Rarity: 0
+  TargetWeaponName: Pistol
+  Stat: 1
+  Value: 0.3

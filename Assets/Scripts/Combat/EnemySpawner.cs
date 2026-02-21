@@ -13,6 +13,8 @@ namespace TypeRogue
     /// </summary>
     public class EnemySpawner : MonoBehaviour
     {
+        public event System.Action WaveCleared;
+
         [Header("Wave Configuration")]
         [SerializeField] private List<WaveData> waves;
         [SerializeField] private bool autoStart = false; // 由 Bootstrap 控制启动
@@ -21,6 +23,8 @@ namespace TypeRogue
         [SerializeField] private SpriteRenderer spawnArea; // 引用场景中的方形 Sprite
 
         private Coroutine currentWaveCoroutine;
+        private int activeEnemyCount = 0;
+        private bool isWaveSpawning = false;
 
         private void Start()
         {
@@ -44,6 +48,8 @@ namespace TypeRogue
             }
             
             Debug.Log($"[EnemySpawner] Starting Wave {waveIndex}");
+            activeEnemyCount = 0;
+            isWaveSpawning = true;
             currentWaveCoroutine = StartCoroutine(ProcessWaveRoutine(waves[waveIndex]));
         }
 
@@ -54,6 +60,7 @@ namespace TypeRogue
                 StopCoroutine(currentWaveCoroutine);
                 currentWaveCoroutine = null;
             }
+            isWaveSpawning = false;
         }
 
         private IEnumerator ProcessWaveRoutine(WaveData waveData)
@@ -89,8 +96,11 @@ namespace TypeRogue
                 }
             }
             
-            Debug.Log("[EnemySpawner] Wave Completed");
+            Debug.Log("[EnemySpawner] Wave Spawning Completed");
             currentWaveCoroutine = null;
+            isWaveSpawning = false;
+            
+            CheckWaveClear();
         }
 
         private void SpawnEnemy(EnemyData enemyData)
@@ -114,6 +124,28 @@ namespace TypeRogue
             
             var enemy = Instantiate(enemyData.Prefab, spawnPos, Quaternion.identity);
             enemy.Initialize(enemyData);
+            
+            activeEnemyCount++;
+            enemy.Died += OnEnemyDied;
+        }
+
+        private void OnEnemyDied(Enemy enemy)
+        {
+            enemy.Died -= OnEnemyDied;
+            activeEnemyCount--;
+            Debug.Log($"[EnemySpawner] Enemy Died. Remaining active enemies: {activeEnemyCount}");
+            CheckWaveClear();
+        }
+
+        private void CheckWaveClear()
+        {
+            if (!isWaveSpawning && activeEnemyCount <= 0)
+            {
+                Debug.Log("==========================================");
+                Debug.Log($"[EnemySpawner] >>> WAVE CLEARED! <<<");
+                Debug.Log("==========================================");
+                WaveCleared?.Invoke();
+            }
         }
     }
 }

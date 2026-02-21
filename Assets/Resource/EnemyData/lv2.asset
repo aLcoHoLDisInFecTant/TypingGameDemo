@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7a57e5caded3944ca77916914ce063c, type: 3}
   m_Name: lv2
   m_EditorClassIdentifier: 
-  EnemyName: Enemy
-  Prefab: {fileID: 0}
+  EnemyName: Enemy_lv2
+  Prefab: {fileID: 8100709708520790231, guid: 471378e7a70ca274e818c7d7f457196c, type: 3}
   MaxHp: 3
   MoveSpeed: 2
   DamageToPlayer: 10

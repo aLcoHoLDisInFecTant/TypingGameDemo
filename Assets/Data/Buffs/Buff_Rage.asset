@@ -9,11 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7a57e5caded3944ca77916914ce063c, type: 3}
-  m_Name: lv1
+  m_Script: {fileID: 11500000, guid: 645dc7469de277446b6822464dbfded1, type: 3}
+  m_Name: Buff_Rage
   m_EditorClassIdentifier: 
-  EnemyName: Enemy_lv1
-  Prefab: {fileID: 3348482379997688013, guid: 3fd3bd054bc8a814ab1debcbd43e8677, type: 3}
-  MaxHp: 10
-  MoveSpeed: 0.5
-  DamageToPlayer: 10
+  BuffName: Rage
+  TriggerWord: rage
+  Icon: {fileID: 0}
+  Description: 
+  Cooldown: 2
+  Effects:
+  - {fileID: 11400000, guid: 2a28c8cff8b351f4e8615ba7d22b3982, type: 2}

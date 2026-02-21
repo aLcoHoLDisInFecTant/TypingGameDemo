@@ -26,9 +26,15 @@ namespace TypeRogue
         private bool isFiringSequential = false; // 是否正在进行连射
         private int preciseShotsRemaining = 0; // 剩余的精准射击次数 (Legacy)
         
+        // 属性修改器 (Stat Boosts)
+        private float fireRateMultiplier = 1.0f; // 射速倍率 (1.0 = 正常, 0.5 = 2倍射速, 实际上是间隔倍率)
+        private float damageMultiplier = 1.0f;   // 伤害倍率
+        private float spreadMultiplier = 1.0f;   // 散射倍率
+        private int piercingBonus = 0;           // 穿透加成
+
         // 属性访问器
         public string WeaponName => weaponData != null ? weaponData.WeaponName : "Unknown";
-        public float FireIntervalSeconds => weaponData != null ? weaponData.FireInterval : 0.5f;
+        public float FireIntervalSeconds => (weaponData != null ? weaponData.FireInterval : 0.5f) * fireRateMultiplier;
 
         public void Initialize(Transform muzzle, WeaponData data = null, BuffController buffController = null)
         {
@@ -38,6 +44,30 @@ namespace TypeRogue
                 this.weaponData = data;
             }
             this.buffController = buffController;
+        }
+        
+        public void BoostFireRate(float reductionPercent)
+        {
+            // reductionPercent: 0.1 means 10% faster (interval * 0.9)
+            fireRateMultiplier *= (1.0f - reductionPercent);
+            Debug.Log($"[WeaponController] {WeaponName} Fire Rate Boosted! New Multiplier: {fireRateMultiplier}");
+        }
+
+        public void BoostDamage(float increasePercent)
+        {
+            // increasePercent: 0.1 means 10% more damage
+            damageMultiplier *= (1.0f + increasePercent);
+            Debug.Log($"[WeaponController] {WeaponName} Damage Boosted! New Multiplier: {damageMultiplier}");
+        }
+
+        public void BoostSpread(float reductionPercent)
+        {
+             spreadMultiplier *= (1.0f - reductionPercent);
+        }
+
+        public void BoostPiercing(int count)
+        {
+            piercingBonus += count;
         }
 
         /// <summary>
@@ -62,6 +92,11 @@ namespace TypeRogue
             // 1. 创建射击上下文
             var context = new WeaponFireContext(weaponData);
             
+            // 应用基础属性修改
+            context.BaseDamage = Mathf.CeilToInt(context.BaseDamage * damageMultiplier);
+            context.SpreadAngle *= spreadMultiplier;
+            context.PiercingCount += piercingBonus;
+
             // 2. 应用 Buff
             if (buffController != null)
             {

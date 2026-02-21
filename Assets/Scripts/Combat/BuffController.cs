@@ -54,6 +54,20 @@ namespace TypeRogue
             NotifyChanged();
         }
 
+        public void AddBuff(BuffData newBuff)
+        {
+            if (newBuff == null) return;
+            
+            // Avoid duplicates? Or allow stacking? Assuming unique for now based on TriggerWord
+            if (availableBuffs.Any(b => b.Data == newBuff))
+            {
+                return;
+            }
+
+            availableBuffs.Add(new BuffInstance(newBuff));
+            NotifyChanged();
+        }
+
         private void Update()
         {
             bool anyChanged = false;

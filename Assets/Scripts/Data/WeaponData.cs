@@ -42,5 +42,9 @@ namespace TypeRogue.Data
 
         [Tooltip("穿透次数 (0表示击中即销毁，1表示可穿透1个敌人击中第2个)")]
         public int PiercingCount = 0;
+
+        [Header("Command Configuration")]
+        [Tooltip("默认触发该武器的命令词（别名）")]
+        public string[] DefaultAliases;
     }
 }

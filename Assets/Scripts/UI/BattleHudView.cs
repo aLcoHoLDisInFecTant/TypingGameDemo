@@ -51,6 +51,11 @@ namespace TypeRogue
             if (waveText != null) waveText.text = $"Wave {waveIndex}";
         }
 
+        public void SetWaveText(string text)
+        {
+            if (waveText != null) waveText.text = text;
+        }
+
         public void SetPlayerHp(int hp)
         {
             if (playerHpText != null) playerHpText.text = $"HP {hp}";
@@ -71,6 +76,14 @@ namespace TypeRogue
                 default:
                     lastTypingResultText.text = string.Empty;
                     break;
+            }
+        }
+
+        public void AddWeapon(string weaponName)
+        {
+            if (weaponStatusPanelView != null)
+            {
+                weaponStatusPanelView.AddWeapon(weaponName);
             }
         }
     }

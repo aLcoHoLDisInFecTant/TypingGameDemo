@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using TypeRogue.Data; // Added namespace
+using TypeRogue.Rogue;
+using TypeRogue.Rogue.Upgrades;
+using TypeRogue.UI.Rogue;
 
 namespace TypeRogue
 {
@@ -23,6 +26,7 @@ namespace TypeRogue
         [SerializeField] private PlayerController playerController;
         [SerializeField] private EnemySpawner enemySpawner;
         [SerializeField] private BuffController buffController; // 新增
+        [SerializeField] private RogueManager rogueManager;
 
         [Header("Data Configuration")]
         [SerializeField] private WeaponData startingWeaponData; // 初始武器数据 (Pistol)
@@ -34,11 +38,24 @@ namespace TypeRogue
         [SerializeField] private BattleHudView battleHudView;
         [SerializeField] private TypingInputBarView typingInputBarView;
         [SerializeField] private WeaponStatusPanelView weaponStatusPanelView;
+        [SerializeField] private RogueShopView rogueShopView;
 
         [Header("Run (Temporary)")]
         [SerializeField] private int initialWaveIndex = 1;
+        [SerializeField] private int maxWaves = 3;
+
+        public enum GameState
+        {
+            MainMenu,
+            Playing,
+            Shop,
+            Victory,
+            GameOver
+        }
 
         private bool isSetup;
+        private int currentWaveIndex = 0;
+        private GameState gameState = GameState.MainMenu;
         private WeaponStatusItemView pistolStatusItem; // 缓存手枪的UI Item引用
         private WeaponStatusItemView shotgunStatusItem;
         private WeaponStatusItemView rifleStatusItem;
@@ -54,6 +71,8 @@ namespace TypeRogue
             BattleHudView battleHudView,
             TypingInputBarView typingInputBarView,
             WeaponStatusPanelView weaponStatusPanelView,
+            RogueManager rogueManager,
+            RogueShopView rogueShopView,
             WeaponData startingWeaponData = null)
         {
             this.typingInputRouter = typingInputRouter;
@@ -66,6 +85,8 @@ namespace TypeRogue
             this.battleHudView = battleHudView;
             this.typingInputBarView = typingInputBarView;
             this.weaponStatusPanelView = weaponStatusPanelView;
+            this.rogueManager = rogueManager;
+            this.rogueShopView = rogueShopView;
             if (startingWeaponData != null) this.startingWeaponData = startingWeaponData;
 
             TrySetup();
@@ -75,10 +96,10 @@ namespace TypeRogue
         {
             if (TrySetup())
             {
-                // 启动第一波敌人
-                // 假设 WaveIndex 从 1 开始，转换为 0 索引
-                int waveIndex = Mathf.Max(0, initialWaveIndex - 1);
-                enemySpawner.StartWave(waveIndex);
+                // Don't start wave immediately. Wait for "begin".
+                gameState = GameState.MainMenu;
+                Debug.Log("[Bootstrap] Game Ready. Waiting for 'begin' command.");
+                if (battleHudView != null) battleHudView.SetWaveText("Type 'begin' to start");
                 return;
             }
 
@@ -101,10 +122,12 @@ namespace TypeRogue
             if (pistolWeaponController == null) pistolWeaponController = GetComponent<WeaponController>();
             
             if (buffController == null) buffController = GetComponent<BuffController>(); // 自动获取
+            if (rogueManager == null) rogueManager = GetComponent<RogueManager>();
             
             // 尝试查找场景中的组件（如果没有手动拖拽）
             if (playerController == null) playerController = FindFirstObjectByType<PlayerController>();
             if (enemySpawner == null) enemySpawner = FindFirstObjectByType<EnemySpawner>();
+            if (rogueShopView == null) rogueShopView = FindFirstObjectByType<RogueShopView>();
 
             TrySetup();
         }
@@ -137,11 +160,15 @@ namespace TypeRogue
             }
             
             // 初始化解释器，传入各武器的别名
-            // 这里硬编码一些别名，实际项目中应从 WeaponData 读取
+            // 默认只解锁手枪 (startingWeaponData)
+            var pistolAliases = startingWeaponData != null && startingWeaponData.DefaultAliases != null && startingWeaponData.DefaultAliases.Length > 0 
+                ? startingWeaponData.DefaultAliases 
+                : new[] { "pistol", "手枪", "p" };
+
             typingCommandInterpreter.Initialize(
-                new[] { "pistol", "手枪", "p" }, 
-                new[] { "shotgun", "霰弹枪", "s" },
-                new[] { "rifle", "步枪", "r" },
+                pistolAliases, 
+                new string[0], // Shotgun locked by default
+                new string[0], // Rifle locked by default
                 buffWords); 
             
             typingCommandInterpreter.Resolved += OnResolved;
@@ -155,10 +182,17 @@ namespace TypeRogue
             
             playerController.HpChanged += OnPlayerHpChanged; // 订阅血量变化
 
-            // 5. 初始化 Buff 系统
+            // 4. 初始化 Buff 系统
             buffController.Initialize(startingBuffs);
             buffController.BuffsChanged += OnBuffsChanged;
             
+            // 5. 初始化 Rogue 系统
+            if (rogueManager != null)
+            {
+                rogueManager.Initialize(this, rogueShopView);
+            }
+            enemySpawner.WaveCleared += OnWaveCleared;
+
             // 6. 初始化 UI (需要 Buff 数据)
             battleHudView.Initialize(playerController.CurrentHp, startingBuffs); 
             battleHudView.SetWave(initialWaveIndex);
@@ -168,11 +202,12 @@ namespace TypeRogue
                 weaponStatusPanelView.Initialize();
                 // 注册初始武器
                 pistolStatusItem = weaponStatusPanelView.AddWeapon("PISTOL");
-                if (shotgunWeaponController != null) shotgunStatusItem = weaponStatusPanelView.AddWeapon("SHOTGUN");
-                if (rifleWeaponController != null) rifleStatusItem = weaponStatusPanelView.AddWeapon("RIFLE");
+                // Don't add Shotgun/Rifle initially. They will be added via UnlockWeapon.
+                // if (shotgunWeaponController != null) shotgunStatusItem = weaponStatusPanelView.AddWeapon("SHOTGUN");
+                // if (rifleWeaponController != null) rifleStatusItem = weaponStatusPanelView.AddWeapon("RIFLE");
             }
 
-            // 5. 初始化输入栏
+            // 7. 初始化输入栏
             typingInputBarView.Initialize(null); // 同上
 
             isSetup = true;
@@ -180,7 +215,151 @@ namespace TypeRogue
             return true;
         }
 
+        private void OnWaveCleared()
+        {
+            Debug.Log($"[Bootstrap] Wave {currentWaveIndex + 1} Cleared! Initiating Rogue Shop sequence...");
+            // 暂停输入? 暂时不需要，因为RogueManager会接管
+            if (rogueManager != null)
+            {
+                Debug.Log("[Bootstrap] Calling RogueManager.OpenShop()");
+                rogueManager.OpenShop();
+            }
+            else
+            {
+                Debug.LogWarning("[Bootstrap] RogueManager not assigned! Skipping shop.");
+                // 如果没有 RogueManager，直接下一波
+                OnShopClosed();
+            }
+        }
 
+        public void OnShopClosed()
+        {
+            Debug.Log("[Bootstrap] Shop Closed. Preparing next wave.");
+            currentWaveIndex++;
+            
+            if (currentWaveIndex >= maxWaves)
+            {
+                Victory();
+            }
+            else
+            {
+                Debug.Log($"[Bootstrap] >>> STARTING WAVE: {currentWaveIndex + 1} <<<");
+                gameState = GameState.Playing;
+                battleHudView.SetWave(currentWaveIndex + 1);
+                enemySpawner.StartWave(currentWaveIndex);
+            }
+        }
+
+        private void Victory()
+        {
+            Debug.Log("[Bootstrap] VICTORY!");
+            gameState = GameState.Victory;
+            if (battleHudView != null) battleHudView.SetWaveText("VICTORY! Type 'restart'");
+            // Cleanup enemies? They should be dead.
+        }
+
+        private void GameOver()
+        {
+            Debug.Log("[Bootstrap] GAME OVER!");
+            gameState = GameState.GameOver;
+            if (battleHudView != null) battleHudView.SetWaveText("GAME OVER! Type 'restart'");
+            if (enemySpawner != null) enemySpawner.StopSpawning();
+        }
+
+        public void UnlockWeapon(WeaponData weapon)
+        {
+            if (weapon == null) return;
+            Debug.Log($"[Bootstrap] Unlocking Weapon: {weapon.WeaponName}");
+
+            // 确定武器类型并注册别名
+            TypingResolveResultType type = TypingResolveResultType.UnknownWord;
+            string[] aliases = weapon.DefaultAliases;
+
+            if (weapon == shotgunWeaponData)
+            {
+                type = TypingResolveResultType.WeaponShotgun;
+                if (aliases == null || aliases.Length == 0) aliases = new[] { "shotgun", "霰弹枪", "s" };
+            }
+            else if (weapon == rifleWeaponData)
+            {
+                type = TypingResolveResultType.WeaponRifle;
+                if (aliases == null || aliases.Length == 0) aliases = new[] { "rifle", "步枪", "r" };
+            }
+
+            if (type != TypingResolveResultType.UnknownWord && aliases != null)
+            {
+                foreach (var alias in aliases)
+                {
+                    typingCommandInterpreter.RegisterAlias(type, alias);
+                }
+                
+                // Add to UI
+                if (type == TypingResolveResultType.WeaponShotgun)
+                {
+                    shotgunStatusItem = weaponStatusPanelView.AddWeapon("SHOTGUN");
+                }
+                else if (type == TypingResolveResultType.WeaponRifle)
+                {
+                    rifleStatusItem = weaponStatusPanelView.AddWeapon("RIFLE");
+                }
+            }
+        }
+
+        public void UnlockBuff(Data.BuffData buff)
+        {
+            if (buff == null) return;
+            Debug.Log($"[Bootstrap] Unlocking Buff: {buff.BuffName}");
+            
+            if (!string.IsNullOrEmpty(buff.TriggerWord))
+            {
+                typingCommandInterpreter.RegisterAlias(TypingResolveResultType.ModifierAccepted, buff.TriggerWord);
+                
+                // Add to BuffController. This will trigger BuffsChanged -> UI Update.
+                if (buffController != null)
+                {
+                    buffController.AddBuff(buff);
+                }
+            }
+        }
+
+        public void RegisterAlias(TypingResolveResultType type, string alias)
+        {
+            typingCommandInterpreter.RegisterAlias(type, alias);
+        }
+
+        public void ModifyWeaponStat(string targetWeaponName, StatBoostUpgrade.StatType stat, float value)
+        {
+            var controllers = new List<WeaponController>();
+            if (pistolWeaponController != null) controllers.Add(pistolWeaponController);
+            if (shotgunWeaponController != null) controllers.Add(shotgunWeaponController);
+            if (rifleWeaponController != null) controllers.Add(rifleWeaponController);
+
+            foreach (var controller in controllers)
+            {
+                bool isTarget = string.IsNullOrEmpty(targetWeaponName) || 
+                                targetWeaponName.Equals("All", StringComparison.OrdinalIgnoreCase) ||
+                                controller.WeaponName.Contains(targetWeaponName, StringComparison.OrdinalIgnoreCase);
+
+                if (isTarget)
+                {
+                    switch (stat)
+                    {
+                        case StatBoostUpgrade.StatType.DamageMultiplier:
+                            controller.BoostDamage(value);
+                            break;
+                        case StatBoostUpgrade.StatType.FireRate:
+                            controller.BoostFireRate(value);
+                            break;
+                        case StatBoostUpgrade.StatType.SpreadReduction:
+                            controller.BoostSpread(value);
+                            break;
+                        case StatBoostUpgrade.StatType.Piercing:
+                            controller.BoostPiercing(Mathf.RoundToInt(value));
+                            break;
+                    }
+                }
+            }
+        }
 
         private void OnDestroy()
         {
@@ -207,6 +386,11 @@ namespace TypeRogue
             {
                 buffController.BuffsChanged -= OnBuffsChanged;
             }
+            
+            if (enemySpawner != null)
+            {
+                enemySpawner.WaveCleared -= OnWaveCleared;
+            }
         }
 
         private void Update()
@@ -231,8 +415,34 @@ namespace TypeRogue
             typingInputBarView.SetBuffer(buffer);
         }
 
+        private void StartGame()
+        {
+            Debug.Log("[Bootstrap] Starting Game!");
+            gameState = GameState.Playing;
+            currentWaveIndex = Mathf.Max(0, initialWaveIndex - 1);
+            if (battleHudView != null) battleHudView.SetWave(currentWaveIndex + 1);
+            if (enemySpawner != null) enemySpawner.StartWave(currentWaveIndex);
+        }
+
         private void OnWordSubmitted(string word)
         {
+            if (gameState == GameState.MainMenu && word.Equals("begin", StringComparison.OrdinalIgnoreCase))
+            {
+                StartGame();
+                typingInputRouter.ClearBuffer();
+                return;
+            }
+
+            if (gameState != GameState.Playing)
+            {
+                 if ((gameState == GameState.GameOver || gameState == GameState.Victory) && 
+                     word.Equals("restart", StringComparison.OrdinalIgnoreCase))
+                 {
+                     UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+                 }
+                 return;
+            }
+
             var result = typingCommandInterpreter.SubmitWord(word);
             switch (result.Type)
             {
@@ -283,6 +493,11 @@ namespace TypeRogue
         {
             battleHudView.SetPlayerHp(newHp);
             Debug.Log($"[UI] Updated Player HP: {newHp}");
+            
+            if (newHp <= 0 && gameState == GameState.Playing)
+            {
+                GameOver();
+            }
         }
     }
 }
